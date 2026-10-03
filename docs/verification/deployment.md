@@ -51,3 +51,7 @@ Controlled Chrome verification confirmed 100% → 150% → 200% zoom, accurate u
 ## Published zoom and preview release
 
 Application commit `ea279e90c3886aecc311b81f052fa447c5266b78` deployed READY to https://pigment-2f2wnv74m-sprioleau-projects.vercel.app in 25 seconds. Both https://pigment.sprioleau.dev and https://pigment.sprioleau.dev/explore/puffy returned HTTP 200 over HTTPS. An error-level runtime log snapshot returned no logs. The workshop screenshot and final verification record are included in the following documentation commit.
+
+## Approved Puffy theme and branding
+
+The approved Puffy Paint Club theme was published throughout the application in commit `2522975cbe052d54c8b6b2b62129c50cff573185`; its production build completed READY. Branding commit `bd8fb8d` updates the approved mascot logo, exact 1200 × 630 social card, Apple icon, normal/maskable app icons, and RGBA PNG-backed ICO favicon. Brand-generation prompts and original outputs are recorded in `docs/concepts/puffy-brand-prompts.txt` and `source-art`.

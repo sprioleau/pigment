@@ -22,3 +22,7 @@ Verified with the controlled Codex in-app browser against the local application 
 The automated engine and export-route suite contains 19 behavioral tests. ESLint and TypeScript checks passed. Vercel completed the initial production build successfully; local Turbopack worker binding was restricted by the desktop sandbox.
 
 Gallery data and puzzle edits are browser-local. This verification does not claim cloud synchronization or offline caching.
+
+The approved Puffy Paint Club direction now appears throughout the main home, picture picker, canvas, gallery, importer, and workshop. Palette buckets and the pointer brush are genuine Three.js meshes with lighting and shared geometry/materials. Bucket buttons and numbers remain accessible HTML controls. The selected brush paint material updates directly from the bucket color. The mesh tip is anchored at the real canvas click point; the brush stays hidden for touch input. Renderer resources are disposed on leaving the board, and CSS controls remain available when WebGL cannot initialize.
+
+Chrome verification confirmed all six real bucket models, enlarged bucket sizing, a real Rose pink bucket click followed by a successful mane fill, and correct brush hotspot alignment. Reduced-motion mode removes hover/dab animation. The fullscreen 3D overlay renders the current viewport; mobile evidence uses viewport screenshots with the palette scrolled into view.
