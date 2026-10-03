@@ -15,7 +15,7 @@ An enchanted color-by-number game for little artists. Pick a picture, choose a p
 ## A paintbox full of little wonders
 
 - **Choose an adventure.** Cloud Unicorn, Flower Kitty, and Clover Cow, with difficulty filters and large picture cards.
-- **Paint with a little magic.** Touch or click the HTML canvas. A brush cursor carries your selected color, and each correct fill sends out a burst of paint.
+- **Paint with a little magic.** Touch or click the HTML canvas. Real 3D paint buckets and a clay brush carry your selected color, and each correct fill sends out a burst of paint.
 - **Get a closer look.** Zoom into small areas and pan around the artwork, then fit the picture back into view.
 - **Take your time.** Gentle wrong-color hints, undo, and a gallery that keeps unfinished pictures ready to resume.
 - **Keep your masterpiece.** Download a PNG whenever you like, with the painted artwork and no printed numbers or game controls.

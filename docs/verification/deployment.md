@@ -55,3 +55,7 @@ Application commit `ea279e90c3886aecc311b81f052fa447c5266b78` deployed READY to 
 ## Approved Puffy theme and branding
 
 The approved Puffy Paint Club theme was published throughout the application in commit `2522975cbe052d54c8b6b2b62129c50cff573185`; its production build completed READY. Branding commit `bd8fb8d` updates the approved mascot logo, exact 1200 × 630 social card, Apple icon, normal/maskable app icons, and RGBA PNG-backed ICO favicon. Brand-generation prompts and original outputs are recorded in `docs/concepts/puffy-brand-prompts.txt` and `source-art`.
+
+## Genuine 3D paint tools release
+
+Commit `f4023b2d801deef52b6cc8961c6e3757cf2ccab4` deployed READY to https://pigment-dwrifuq66-sprioleau-projects.vercel.app after an 18-second cloud build. The custom domain is attached to this release. It includes real Three.js bucket geometry, a shared clay brush factory, direct selected-paint material updates, viewport-aligned mesh rendering, touch-safe input, and resource cleanup.
