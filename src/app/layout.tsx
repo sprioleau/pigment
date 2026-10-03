@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import MusicPlayer from "@/components/music-player";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,7 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pigment.sprioleau.dev"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://pigment.sprioleau.dev",
+  ),
   title: "Pigment",
   applicationName: "Pigment",
   description: "An enchanted color-by-number game for little artists.",
@@ -25,7 +28,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Pigment",
-    description: "A little color, a little magic. An enchanted color-by-number game for little artists.",
+    description:
+      "A little color, a little magic. An enchanted color-by-number game for little artists.",
     siteName: "Pigment",
     type: "website",
     locale: "en_US",
@@ -33,7 +37,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Pigment",
-    description: "A little color, a little magic. An enchanted color-by-number game for little artists.",
+    description:
+      "A little color, a little magic. An enchanted color-by-number game for little artists.",
   },
 };
 
@@ -47,7 +52,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <MusicPlayer />
+      </body>
     </html>
   );
 }

@@ -17,6 +17,7 @@ An enchanted color-by-number game for little artists. Pick a picture, choose a p
 - **Choose an adventure.** Cloud Unicorn, Flower Kitty, and Clover Cow, with difficulty filters and large picture cards.
 - **Paint with a little magic.** Touch or click the HTML canvas. Real 3D paint buckets and a clay brush carry your selected color, and each correct fill sends out a burst of paint.
 - **Get a closer look.** Zoom into small areas and pan around the artwork, then fit the picture back into view.
+- **Set the mood.** A quiet, playful soundtrack loops across screens. The music toggle remembers your choice in this browser.
 - **Take your time.** Gentle wrong-color hints, undo, and a gallery that keeps unfinished pictures ready to resume.
 - **Keep your masterpiece.** Download a PNG whenever you like, with the painted artwork and no printed numbers or game controls.
 - **Make another.** Paint again or choose a different picture after finishing.
@@ -72,6 +73,8 @@ Imports accept PNG, JPEG, or WebP files up to 12 MB. Use clean black-and-white l
 Open **Puzzle Workshop** from the main menu to edit any starter or imported picture. Save its changes to create a playable override in this browser. Existing gallery drawings keep the version they started with. Workshop edits do not publish to other devices or change the repository’s original artwork.
 
 ## Artwork credits
+
+Music: **[Children's March Theme](https://opengameart.org/content/childrens-march-theme)** by **Cleyton Kauffman**, released under **[CC0](https://creativecommons.org/publicdomain/zero/1.0/)**. See [audio credits](public/audio/CREDITS.md) for the source and format conversion.
 
 Cloud Unicorn is original Pigment artwork created with the built-in image generation tool. The user supplied the Hello Kitty and cow worksheets:
 

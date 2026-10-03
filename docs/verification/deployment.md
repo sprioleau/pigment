@@ -59,3 +59,9 @@ The approved Puffy Paint Club theme was published throughout the application in 
 ## Genuine 3D paint tools release
 
 Commit `f4023b2d801deef52b6cc8961c6e3757cf2ccab4` deployed READY to https://pigment-dwrifuq66-sprioleau-projects.vercel.app after an 18-second cloud build. The custom domain is attached to this release. It includes real Three.js bucket geometry, a shared clay brush factory, direct selected-paint material updates, viewport-aligned mesh rendering, touch-safe input, and resource cleanup.
+
+## Background music release
+
+A persistent global music player uses the CC0 Children's March Theme by Cleyton Kauffman. The 64-second mono 22,050 Hz, 16-bit PCM WAV is served from `/audio/childrens-march.wav`; source and license attribution are recorded in `/audio/CREDITS.md`. Short cosine fades make both loop boundary samples zero.
+
+Controlled browser checks confirmed first-interaction playback, continued music across game screens, mute state across navigation and reload, and explicit Play music resuming playback. Full lint and all 19 behavioral tests passed before publication.
