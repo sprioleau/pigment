@@ -47,3 +47,7 @@ Navigation and game/workshop actions use named Lucide React icons with consisten
 Game and workshop canvases now support 100%–300% zoom in 50% steps and a Fit reset. Zoom preserves the canvas pixel resolution and uses the rendered bounds for hit testing. The game treats a short pointer gesture as a tap and rejects drags longer than 8 pixels; the enlarged viewport supports native touch scrolling. Workshop users can choose Pan picture while zoomed without interfering with drawing and number movement tools.
 
 Controlled Chrome verification confirmed 100% → 150% → 200% zoom, accurate unicorn face painting at 200%, Fit reset with retained paint, and no paint from a drag. The workshop's Save puzzle changes status remained visible after its library update. Region button debug panels are hidden unless the URL contains `?debug=1`. Scoped ESLint, TypeScript, and all 19 Vitest tests passed.
+
+## Published zoom and preview release
+
+Application commit `ea279e90c3886aecc311b81f052fa447c5266b78` deployed READY to https://pigment-2f2wnv74m-sprioleau-projects.vercel.app in 25 seconds. Both https://pigment.sprioleau.dev and https://pigment.sprioleau.dev/explore/puffy returned HTTP 200 over HTTPS. An error-level runtime log snapshot returned no logs. The workshop screenshot and final verification record are included in the following documentation commit.
