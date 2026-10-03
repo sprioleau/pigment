@@ -1,5 +1,7 @@
 "use client";
 
+import { broadcastPaintColor } from "@/lib/paint-color";
+
 import { Brush, Eraser, Hand, Home, Move, PaintBucket, Save, Scan, Undo2 } from "lucide-react";
 import GameIcon from "./game-icon";
 import CanvasZoom from "./canvas-zoom";
@@ -96,6 +98,11 @@ function WorkshopEditor({
     segmentation && region
       ? getRegionLabelPosition(segmentation, region, picture.labelPositions)
       : null;
+
+  useEffect(() => {
+    broadcastPaintColor(picture.palette[selectedNumber - 1]);
+    return () => { broadcastPaintColor("#F8AED2"); };
+  }, [picture.palette, selectedNumber]);
 
   useEffect(() => {
     let isCancelled = false;

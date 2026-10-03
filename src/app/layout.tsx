@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import ButtonDelight from "@/components/button-delight";
+import GlobalPaintCursor from "@/components/global-paint-cursor";
 import MusicPlayer from "@/components/music-player";
 import "./globals.css";
+import "@/components/paint-cursor-global.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +58,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <MusicPlayer />
+        <GlobalPaintCursor />
+        <ButtonDelight />
       </body>
     </html>
   );

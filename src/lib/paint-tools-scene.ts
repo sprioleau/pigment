@@ -1,17 +1,13 @@
 import type { RefObject } from "react";
-import { createClayPaintbrush } from "./clay-paintbrush";
-
-export type PaintPointer = { x: number; y: number; isVisible: boolean; isPressed: boolean };
 
 type Props = {
   canvas: HTMLCanvasElement;
   palette: HTMLElement;
   colors: string[];
   selectedNumber: RefObject<number>;
-  pointer: RefObject<PaintPointer>;
 };
 
-export async function mountPaintToolsScene({ canvas, palette, colors, selectedNumber, pointer }: Props): Promise<(() => void) | undefined> {
+export async function mountPaintToolsScene({ canvas, palette, colors, selectedNumber }: Props): Promise<(() => void) | undefined> {
   const THREE = await import("three");
   let renderer: InstanceType<typeof THREE.WebGLRenderer>;
   try {
@@ -78,11 +74,6 @@ export async function mountPaintToolsScene({ canvas, palette, colors, selectedNu
     return bucket;
   });
 
-  const brushAsset = createClayPaintbrush(THREE);
-  const brush = brushAsset.group;
-  brush.visible = false;
-  scene.add(brush);
-
   function resize(): void {
     camera.right = window.innerWidth;
     camera.bottom = -window.innerHeight;
@@ -124,11 +115,6 @@ export async function mountPaintToolsScene({ canvas, palette, colors, selectedNu
         bucket.rotation.y += (targetY - bucket.rotation.y) * .18;
       }
     });
-    const point = pointer.current;
-    brush.visible = point.isVisible;
-    brush.position.set(point.x, -point.y, 100);
-    brush.scale.setScalar(point.isPressed && !shouldReduceMotion ? .9 : 1);
-    brushAsset.paintMaterial.color.set(colors[selectedNumber.current - 1] ?? colors[0]);
     renderer.render(scene, camera);
     animationFrame = requestAnimationFrame(animate);
   }
@@ -146,7 +132,6 @@ export async function mountPaintToolsScene({ canvas, palette, colors, selectedNu
     palette.removeEventListener("pointerleave", clearHover);
     geometries.forEach((value) => value.dispose());
     materials.forEach((value) => value.dispose());
-    brushAsset.dispose();
     renderer.dispose();
   };
 }

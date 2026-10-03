@@ -1,0 +1,4 @@
+html[data-pigment-brush="true"],
+html[data-pigment-brush="true"] * {
+  cursor: none !important;
+}

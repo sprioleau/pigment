@@ -25,6 +25,8 @@ export default function MusicPlayer() {
     let source: AudioBufferSourceNode | null = null;
     let gain: GainNode | null = null;
     let bufferPromise: Promise<AudioBuffer> | null = null;
+    let pointerStart: { x: number; y: number; id: number } | null = null;
+    let hasCanceledPointer = false;
     const abortController = new AbortController();
 
     try {
@@ -56,7 +58,7 @@ export default function MusicPlayer() {
         throw new Error("Audio isn’t supported in this browser.");
       context = new AudioContextClass();
       gain = context.createGain();
-      gain.gain.value = 0.18;
+      gain.gain.value = isEnabled ? 0.18 : 0;
       gain.connect(context.destination);
       context.addEventListener("statechange", handleContextState);
       return context;
@@ -102,6 +104,8 @@ export default function MusicPlayer() {
       updateStatus("loading");
       try {
         const audioContext = prepareContext();
+        gain?.gain.cancelScheduledValues(audioContext.currentTime);
+        gain?.gain.setTargetAtTime(0.18, audioContext.currentTime, 0.02);
         /*
           Resume immediately inside the trusted gesture, before network work.
           Later visibility resumes reuse this same context and looping source.
@@ -142,7 +146,10 @@ export default function MusicPlayer() {
         requestId++;
         rememberPreference();
         updateStatus("muted");
-        void context?.suspend().catch(() => {});
+        if (context && gain) {
+          gain.gain.cancelScheduledValues(context.currentTime);
+          gain.gain.setValueAtTime(0, context.currentTime);
+        }
       } else {
         isEnabled = true;
         rememberPreference();
@@ -151,6 +158,15 @@ export default function MusicPlayer() {
     }
 
     function handleInteraction(event: Event): void {
+      if (!event.isTrusted) return;
+      if (event instanceof PointerEvent) {
+        pointerStart = {
+          x: event.clientX,
+          y: event.clientY,
+          id: event.pointerId,
+        };
+        hasCanceledPointer = false;
+      }
       if (
         !event.isTrusted ||
         (event.target instanceof Element &&
@@ -159,6 +175,90 @@ export default function MusicPlayer() {
         return;
       if (event instanceof KeyboardEvent && event.repeat) return;
       void startMusic();
+    }
+
+    function handlePointerMove(event: PointerEvent): void {
+      if (!pointerStart || pointerStart.id !== event.pointerId) return;
+      if (
+        Math.hypot(
+          event.clientX - pointerStart.x,
+          event.clientY - pointerStart.y,
+        ) > 8
+      )
+        hasCanceledPointer = true;
+    }
+
+    function handlePointerCancel(): void {
+      hasCanceledPointer = true;
+    }
+
+    function playButtonPop(audioContext: AudioContext): void {
+      const envelope = audioContext.createGain();
+      const lower = audioContext.createOscillator();
+      const upper = audioContext.createOscillator();
+      const now = audioContext.currentTime;
+      /*
+        A short original two-tone paint pop uses its own output gain. Muting
+        the looping music cannot mute button feedback or stop its context.
+      */
+      envelope.gain.setValueAtTime(0.0001, now);
+      envelope.gain.exponentialRampToValueAtTime(0.04, now + 0.006);
+      envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+      envelope.connect(audioContext.destination);
+      lower.type = "sine";
+      upper.type = "sine";
+      lower.frequency.setValueAtTime(1046, now);
+      lower.frequency.exponentialRampToValueAtTime(784, now + 0.085);
+      upper.frequency.setValueAtTime(1568, now);
+      upper.frequency.exponentialRampToValueAtTime(1175, now + 0.085);
+      lower.connect(envelope);
+      upper.connect(envelope);
+      lower.onended = () => lower.disconnect();
+      upper.onended = () => {
+        upper.disconnect();
+        envelope.disconnect();
+      };
+      lower.start(now);
+      upper.start(now);
+      lower.stop(now + 0.095);
+      upper.stop(now + 0.095);
+    }
+
+    function handleButtonClick(event: MouseEvent): void {
+      if (
+        isDisposed ||
+        !event.isTrusted ||
+        document.hidden ||
+        event.defaultPrevented ||
+        !(event.target instanceof Element)
+      )
+        return;
+      const button = event.target.closest("button, [role='button']");
+      if (
+        !button ||
+        button.matches(":disabled, [aria-disabled='true']") ||
+        button.closest("[inert]") ||
+        (event.detail > 0 && hasCanceledPointer)
+      )
+        return;
+      try {
+        const audioContext = prepareContext();
+        /*
+          Resume synchronously in the click gesture, including with music
+          disabled. Keyboard activation emits this same single native click.
+        */
+        void audioContext
+          .resume()
+          .then(() => {
+            if (
+              !isDisposed &&
+              !document.hidden &&
+              audioContext.state === "running"
+            )
+              playButtonPop(audioContext);
+          })
+          .catch(() => {});
+      } catch {}
     }
 
     function handleVisibility(): void {
@@ -176,6 +276,14 @@ export default function MusicPlayer() {
       capture: true,
     });
     document.addEventListener("keydown", handleInteraction, { capture: true });
+    document.addEventListener("pointermove", handlePointerMove, {
+      capture: true,
+      passive: true,
+    });
+    document.addEventListener("pointercancel", handlePointerCancel, {
+      capture: true,
+    });
+    document.addEventListener("click", handleButtonClick, { capture: true });
     document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       isDisposed = true;
@@ -186,6 +294,15 @@ export default function MusicPlayer() {
         capture: true,
       });
       document.removeEventListener("keydown", handleInteraction, {
+        capture: true,
+      });
+      document.removeEventListener("pointermove", handlePointerMove, {
+        capture: true,
+      });
+      document.removeEventListener("pointercancel", handlePointerCancel, {
+        capture: true,
+      });
+      document.removeEventListener("click", handleButtonClick, {
         capture: true,
       });
       document.removeEventListener("visibilitychange", handleVisibility);
@@ -220,7 +337,7 @@ export default function MusicPlayer() {
         ) : (
           <VolumeX aria-hidden="true" size={22} />
         )}
-        <span>
+        <span className={styles.label}>
           {isLoading ? "Music…" : isPlaying ? "Music on" : "Music off"}
         </span>
       </button>

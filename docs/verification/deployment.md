@@ -65,3 +65,9 @@ Commit `f4023b2d801deef52b6cc8961c6e3757cf2ccab4` deployed READY to https://pigm
 A persistent global music player uses the CC0 Children's March Theme by Cleyton Kauffman. The 64-second mono 22,050 Hz, 16-bit PCM WAV is served from `/audio/childrens-march.wav`; source and license attribution are recorded in `/audio/CREDITS.md`. Short cosine fades make both loop boundary samples zero.
 
 Controlled browser checks confirmed first-interaction playback, continued music across game screens, mute state across navigation and reload, and explicit Play music resuming playback. Full lint and all 19 behavioral tests passed before publication.
+
+## Global cursor and button feedback
+
+The persistent global Three.js brush replaces the earlier board-only cursor. Game and workshop paint selections update its material directly. Its animated rotation and scale preserve the exact tip hotspot; reduced motion disables animation. Fine-pointer and WebGL readiness gate native cursor hiding, and touch input retains normal controls. Board rendering retains only the bucket meshes.
+
+Accessible buttons now produce small colored splash circles and an original synthesized paint-pop sound. The mobile music control uses a compact 48px top-right button. Controlled Chrome checks confirmed one global brush, a precise bucket-3 fill reaching 1/28 regions, keyboard zoom to 150%, eight splash circles after a button click, and all six buckets without overflow at 390px. ESLint, TypeScript, and all 19 Vitest tests passed before release.

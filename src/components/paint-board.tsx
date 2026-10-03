@@ -1,12 +1,13 @@
 "use client";
 
+import { broadcastPaintColor } from "@/lib/paint-color";
+
 import { ArrowLeft, Check, Download, RotateCcw, Save, Undo2, X } from "lucide-react";
 import GameIcon from "./game-icon";
 import CanvasZoom from "./canvas-zoom";
 import { useEffect, useRef, useState, type PointerEvent, type CSSProperties } from "react";
 import Image from "next/image";
 import PaintToolsScene from "./paint-tools-scene";
-import type { PaintPointer } from "@/lib/paint-tools-scene";
 import type { Picture } from "@/lib/pictures";
 import { getRegionLabelPosition, paintPixels, prepareArtwork, regionAt, type Segmentation } from "@/lib/paint-engine";
 
@@ -26,9 +27,7 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
   const tapStart = useRef<{ x: number; y: number; id: number } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const paletteRef = useRef<HTMLElement>(null);
-  const pointerRef = useRef<PaintPointer>({ x: 0, y: 0, isVisible: false, isPressed: false });
   const selectedNumberRef = useRef(1);
-  const [isBrushVisible, setIsBrushVisible] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const timeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hasChanged = useRef(false);
@@ -36,6 +35,11 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
   const completed = segmentation?.regions.filter((region) => Boolean(fills[region.id])).length ?? 0;
   const total = segmentation?.regions.length ?? 0;
   const isComplete = total > 0 && completed === total && !isEditing;
+
+  useEffect(() => {
+    broadcastPaintColor(selectedColor);
+    return () => { broadcastPaintColor("#F8AED2"); };
+  }, [selectedColor]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -124,21 +128,12 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
     }
   }
 
-  function moveBrush(event: PointerEvent<HTMLCanvasElement>): void {
-    const shouldShowBrush = event.pointerType === "mouse" && isSceneReady && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    setIsBrushVisible(shouldShowBrush);
-    pointerRef.current = { ...pointerRef.current, x: event.clientX, y: event.clientY, isVisible: shouldShowBrush };
-  }
-
   function startPointer(event: PointerEvent<HTMLCanvasElement>): void {
-    moveBrush(event);
     if (event.button !== 0) return;
-    pointerRef.current.isPressed = true;
     tapStart.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
   }
 
   function finishPointer(event: PointerEvent<HTMLCanvasElement>): void {
-    pointerRef.current.isPressed = false;
     const start = tapStart.current;
     tapStart.current = null;
     if (!segmentation || !start || start.id !== event.pointerId || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) return;
@@ -163,7 +158,7 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
 
   return (
     <section className="painting-screen">
-      <PaintToolsScene palette={paletteRef} colors={picture.palette} selectedNumber={selectedNumberRef} pointer={pointerRef} onReady={setIsSceneReady} />
+      <PaintToolsScene palette={paletteRef} colors={picture.palette} selectedNumber={selectedNumberRef} onReady={setIsSceneReady} />
       <header className="screen-header">
         <button className="game-button small" onClick={leavePainting}><GameIcon icon={ArrowLeft} /> Pictures</button>
         <div><span className="eyebrow">{isEditing ? "MAKE A NEW ADVENTURE" : "YOUR LITTLE MASTERPIECE"}</span><h1>{picture.title}</h1></div>
@@ -179,7 +174,7 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
           <div className="paper-frame">
             {error ? <p role="alert" className="canvas-message">{error}</p> : !segmentation ? <p className="canvas-message" role="status">Preparing a little magic…</p> : null}
             <CanvasZoom width={segmentation?.width ?? 1} height={segmentation?.height ?? 1}>
-            <canvas ref={canvasRef} aria-label={`${picture.title} coloring canvas. Choose a numbered paint bucket, then tap a matching area.`} onPointerDown={startPointer} onPointerUp={finishPointer} onPointerCancel={() => { tapStart.current = null; pointerRef.current.isPressed = false; }} onPointerEnter={moveBrush} onPointerMove={moveBrush} onPointerLeave={() => { setIsBrushVisible(false); pointerRef.current.isVisible = false; }} style={{ cursor: isSceneReady && isBrushVisible ? "none" : "crosshair", display: segmentation ? "block" : "none" }} />
+            <canvas ref={canvasRef} aria-label={`${picture.title} coloring canvas. Choose a numbered paint bucket, then tap a matching area.`} onPointerDown={startPointer} onPointerUp={finishPointer} onPointerCancel={() => { tapStart.current = null; }} style={{ display: segmentation ? "block" : "none" }} />
             <div className="bursts" style={{ inset: 0 }} aria-hidden="true">{bursts.map((burst) => <div key={burst.id} className="burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }}>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ "--dx": `${Math.cos(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, "--dy": `${Math.sin(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, background: burst.color, opacity: .45 + (i % 3) * .2 } as CSSProperties} />)}</div>)}</div>
             </CanvasZoom>
           </div>
