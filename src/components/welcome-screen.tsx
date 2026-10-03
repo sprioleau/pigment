@@ -7,7 +7,7 @@ import { ArrowLeft, Camera, ChevronRight, Heart, Images, Paintbrush, Puzzle, Sta
 import { mountPuffyScene } from "@/lib/puffy-scene";
 import styles from "./puffy-exploration.module.css";
 
-type Props = { isReady: boolean; onStart: () => void; onGallery: () => void; onImport: () => void; onWorkshop: () => void };
+type Props = { isReady: boolean; isExploration?: boolean; onStart: () => void; onGallery: () => void; onImport: () => void; onWorkshop: () => void };
 type IconName = "brush" | "gallery" | "camera" | "puzzle";
 
 function MenuIcon({ name, isClay }: { name: IconName; isClay: boolean }) {
@@ -23,11 +23,12 @@ function MenuIcon({ name, isClay }: { name: IconName; isClay: boolean }) {
   </svg>;
 }
 
-export default function WelcomeScreen({ isReady, onStart, onGallery, onImport, onWorkshop }: Props) {
+export default function WelcomeScreen({ isReady, isExploration = false, onStart, onGallery, onImport, onWorkshop }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const menuRef = useRef<HTMLElement>(null);
   const hoveredIndex = useRef(-1);
   const pressedIndex = useRef(-1);
+  const hoverPosition = useRef({ x: 0, y: 0 });
   const [hasThreeScene, setHasThreeScene] = useState(false);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -35,7 +36,7 @@ export default function WelcomeScreen({ isReady, onStart, onGallery, onImport, o
     if (!canvas || !menu) return;
     let isCancelled = false;
     let cleanup: (() => void) | undefined;
-    mountPuffyScene(canvas, menu, hoveredIndex, pressedIndex).then((dispose) => {
+    mountPuffyScene(canvas, menu, hoveredIndex, pressedIndex, hoverPosition).then((dispose) => {
       if (isCancelled) { dispose?.(); return; }
       cleanup = dispose;
       setHasThreeScene(Boolean(dispose));
@@ -48,7 +49,7 @@ export default function WelcomeScreen({ isReady, onStart, onGallery, onImport, o
     { icon: "camera" as const, label: "Add a picture", action: onImport, tone: "lavender" },
     { icon: "puzzle" as const, label: "Puzzle Workshop", action: onWorkshop, tone: "blue" },
   ];
-  return <div className={styles.world}><header className={styles.explorationHeader}><Link href="/"><ArrowLeft size={16} aria-hidden="true" /> Back to Pigment</Link><span>Puffy Paint Club · interactive exploration</span></header><section className={styles["puffy-welcome"]} aria-label="Welcome to Pigment">
+  return <div className={`${styles.world} ${!isExploration ? styles.production : ""}`}>{isExploration && <header className={styles.explorationHeader}><Link href="/"><ArrowLeft size={16} aria-hidden="true" /> Back to Pigment</Link><span>Puffy Paint Club · interactive exploration</span></header>}<section className={styles["puffy-welcome"]} aria-label="Welcome to Pigment">
     <div className={styles["puffy-brand"]}>
       <Star className={`${styles["puffy-star"]} ${styles["puffy-star-one"]}`} aria-hidden="true" fill="currentColor" strokeWidth={1} />
       <Star className={`${styles["puffy-star"]} ${styles["puffy-star-two"]}`} aria-hidden="true" fill="currentColor" strokeWidth={1} />
@@ -57,10 +58,10 @@ export default function WelcomeScreen({ isReady, onStart, onGallery, onImport, o
     </div>
     <div className={styles["puffy-menu-panel"]}>
       <p className={styles["puffy-invitation"]}>What shall we make today?</p>
-      <nav ref={menuRef} className={`${styles["puffy-menu"]} ${hasThreeScene ? styles.hasThreeScene : ""}`} aria-label="Game menu"><canvas ref={canvasRef} className={styles.scene} aria-hidden="true" />
-        {items.map((item, index) => <button key={item.icon} className={`${styles["puffy-menu-button"]} ${styles[`puffy-${item.tone}`]}`} onPointerEnter={() => { hoveredIndex.current = index; }} onPointerLeave={() => { hoveredIndex.current = -1; pressedIndex.current = -1; }} onFocus={() => { hoveredIndex.current = index; }} onBlur={() => { hoveredIndex.current = -1; }} onPointerDown={() => { pressedIndex.current = index; }} onPointerUp={() => { pressedIndex.current = -1; }} disabled={!isReady} onClick={item.action}><MenuIcon name={item.icon} isClay={hasThreeScene} /><span>{item.label}</span><ChevronRight className={styles["puffy-chevron"]} aria-hidden="true" strokeWidth={4} /></button>)}
+      <nav ref={menuRef} data-three-menu className={`${styles["puffy-menu"]} ${hasThreeScene ? styles.hasThreeScene : ""}`} aria-label="Game menu"><canvas ref={canvasRef} className={styles.scene} aria-hidden="true" />
+        {items.map((item, index) => <button key={item.icon} className={`${styles["puffy-menu-button"]} ${styles[`puffy-${item.tone}`]}`} onPointerEnter={() => { hoveredIndex.current = index; hoverPosition.current = { x: 0, y: 0 }; }} onPointerMove={(event) => { const bounds = event.currentTarget.getBoundingClientRect(); hoverPosition.current = { x: Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2)), y: Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2)) }; }} onPointerLeave={() => { hoveredIndex.current = -1; pressedIndex.current = -1; hoverPosition.current = { x: 0, y: 0 }; }} onFocus={() => { hoveredIndex.current = index; hoverPosition.current = { x: 0, y: 0 }; }} onBlur={() => { hoveredIndex.current = -1; hoverPosition.current = { x: 0, y: 0 }; }} onPointerDown={() => { pressedIndex.current = index; }} onPointerUp={() => { pressedIndex.current = -1; }} disabled={!isReady} onClick={item.action}><MenuIcon name={item.icon} isClay={hasThreeScene} /><span>{item.label}</span><ChevronRight className={styles["puffy-chevron"]} aria-hidden="true" strokeWidth={4} /></button>)}
       </nav>
       <p className={styles["puffy-kindness"]}>Small creativity. Big smiles. <Heart size={23} aria-hidden="true" /></p>
     </div>
-  </section><p className={styles.explorationHint}>Hover or focus a button to lift it. Tap to try the menu.</p></div>;
+  </section>{isExploration && <p className={styles.explorationHint}>Hover or focus a button to lift it. Tap to try the menu.</p>}</div>;
 }

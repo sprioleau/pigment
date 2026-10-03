@@ -1,14 +1,16 @@
 # Pigment design and implementation
 
-## Enchanted Paintbox
+## Puffy Paint Club
 
-The user selected this direction on October 3, 2026: ornate plum-and-gold storybook frames, cream paper, lilac, pink, mint, and jewel-colored paint buckets. The audience is five- and six-year-old children. Bespoke game controls and illustration-led screens carry the theme throughout.
+The approved direction is a soft toy-like world for five- and six-year-old children: cream and peach scenery, lilac, mint, butter yellow, and pink, with plum lettering. The welcome screen uses a real Three.js cloud mascot and puffy menu objects. Across the game, rounded panels and buttons have soft highlights, sculpted shadows, and gentle hover movement.
 
-The bottom row of [the concept board](concepts/pigment-directions.png) records the selected direction. The top row preserves the alternate Pixel Fairyland concept. The current game is implemented; [screenshots](../public/screenshots/) show its actual interface.
+Picture cards, painting controls, the gallery, import flow, and Puzzle Workshop share this palette and rounded typography. The painterly background, ornate gold frames, scroll corners, and serif headings have been removed. Controls keep large touch targets, visible keyboard focus, and reduced-motion support.
+
+The [early concept board](concepts/pigment-directions.png) is retained as a design reference; it does not represent the current interface. [Screenshots](../public/screenshots/) show the actual game.
 
 ## Implemented screens
 
-1. **Welcome:** Pigment wordmark and unicorn medallion, with Start painting, My gallery, Add a picture, and Puzzle Workshop controls.
+1. **Welcome:** Pigment wordmark, a Three.js cloud mascot and puffy scene, with Start painting, My gallery, Add a picture, and Puzzle Workshop controls.
 2. **Choose a picture:** large illustration cards, difficulty filters, and responsive columns. The starter paintbox contains Cloud Unicorn, Flower Kitty, and Clover Cow.
 3. **Paint:** numbered paint buckets, HTML canvas, selected-color brush cursor, progress, undo, save, and download. Touch and mouse both use Pointer Events. Smaller screens rearrange the layout while keeping controls usable.
 4. **My gallery:** saved finished and unfinished drawings. Opening a drawing resumes its per-region paint state. Storage is local to the current browser.

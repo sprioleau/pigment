@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 
-export async function mountPuffyScene(canvas: HTMLCanvasElement, menu: HTMLElement, hoveredIndex: RefObject<number>, pressedIndex: RefObject<number>): Promise<(() => void) | undefined> {
+export async function mountPuffyScene(canvas: HTMLCanvasElement, menu: HTMLElement, hoveredIndex: RefObject<number>, pressedIndex: RefObject<number>, hoverPosition: RefObject<{ x: number; y: number }>): Promise<(() => void) | undefined> {
   const THREE = await import("three");
   let renderer: InstanceType<typeof THREE.WebGLRenderer>;
   try {
@@ -104,8 +104,9 @@ export async function mountPuffyScene(canvas: HTMLCanvasElement, menu: HTMLEleme
       const hasHover = hoveredIndex.current === index;
       const isPressed = pressedIndex.current === index;
       button.position.z = THREE.MathUtils.lerp(button.position.z, isPressed ? -5 : hasHover ? 25 : 0, .14);
-      button.rotation.x = THREE.MathUtils.lerp(button.rotation.x, hasHover && !shouldReduceMotion ? .08 : 0, .12);
-      button.rotation.z = THREE.MathUtils.lerp(button.rotation.z, hasHover && !shouldReduceMotion ? Math.sin(time * .008) * .025 : 0, .12);
+      button.rotation.x = THREE.MathUtils.lerp(button.rotation.x, hasHover && !shouldReduceMotion ? -hoverPosition.current.y * .065 : 0, .12);
+      button.rotation.y = THREE.MathUtils.lerp(button.rotation.y, hasHover && !shouldReduceMotion ? -hoverPosition.current.x * .065 : 0, .12);
+      button.rotation.z = THREE.MathUtils.lerp(button.rotation.z, hasHover && !shouldReduceMotion ? Math.sin(time * .006) * .007 : 0, .12);
       button.position.y = button.userData.baseY + (hasHover && !shouldReduceMotion ? 4 : 0);
     });
     renderer.render(scene, camera);

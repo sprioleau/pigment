@@ -1,4 +1,6 @@
 .world { min-height: 100dvh; padding: 22px 40px 35px; color: #80608c; font-family: ui-rounded, "Arial Rounded MT Bold", "Trebuchet MS", Arial, sans-serif; background: radial-gradient(ellipse at 0% 0%, #ffe1d5, transparent 35%), radial-gradient(ellipse at 100% 100%, #f2dde9, transparent 45%), #fff3e5; }
+.production { background: transparent; min-height: 0; padding: 5px 18px 15px; }
+.production .puffy-welcome { min-height: calc(100dvh - 125px); }
 .explorationHeader { max-width: 1250px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: 12px; color: #a080a1; }
 .explorationHeader a { display: inline-flex; gap: 6px; align-items: center; color: #80608c; text-decoration: none; padding: 12px 16px; border-radius: 20px; background: #fffbf2; box-shadow: 0 3px 0 #efddce; font-weight: 700; }
 .puffy-welcome { min-height: calc(100dvh - 135px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 35px; align-items: center; max-width: 1240px; margin: auto; }

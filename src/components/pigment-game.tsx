@@ -1,11 +1,12 @@
 "use client";
 
-import { Brush, Check, Home, Images, Plus, Wrench, X } from "lucide-react";
+import { Brush, Check, Home, Images, Plus, X } from "lucide-react";
 import GameIcon from "./game-icon";
 import Image from "next/image";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from "react";
 import PaintBoard from "./paint-board";
 import PuzzleWorkshop from "./puzzle-workshop";
+import WelcomeScreen from "./welcome-screen";
 import {
   EMPTY_LIBRARY,
   MAGIC_PALETTE,
@@ -82,6 +83,7 @@ export default function PigmentGame() {
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const mainRef = useRef<HTMLElement>(null);
+  const tiltedButton = useRef<HTMLButtonElement | null>(null);
   const importRequest = useRef(0);
   const pictures = [
     ...PICTURES.map(
@@ -273,8 +275,37 @@ export default function PigmentGame() {
     });
   }
 
+  function resetButtonTilt(): void {
+    const button = tiltedButton.current;
+    if (!button) return;
+    button.style.setProperty("--tilt-x", "0deg");
+    button.style.setProperty("--tilt-y", "0deg");
+    button.removeAttribute("data-pointer-tilt");
+    tiltedButton.current = null;
+  }
+
+  function handleButtonPointerMove(event: PointerEvent<HTMLElement>): void {
+    if (event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      resetButtonTilt();
+      return;
+    }
+    const button = event.target instanceof Element ? event.target.closest("button") : null;
+    if (!(button instanceof HTMLButtonElement) || button.disabled || button.closest("[data-three-menu]")) {
+      resetButtonTilt();
+      return;
+    }
+    if (button !== tiltedButton.current) resetButtonTilt();
+    const bounds = button.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
+    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
+    button.style.setProperty("--tilt-x", `${-y * 2}deg`);
+    button.style.setProperty("--tilt-y", `${x * 2}deg`);
+    button.setAttribute("data-pointer-tilt", "true");
+    tiltedButton.current = button;
+  }
+
   return (
-    <main ref={mainRef} className={`game-world screen-${screen}`}>
+    <main ref={mainRef} className={`game-world screen-${screen}`} onPointerMove={handleButtonPointerMove} onPointerLeave={resetButtonTilt}>
       <div className="world-sparkles" aria-hidden="true">
         <span>✦</span>
         <span>✧</span>
@@ -304,60 +335,13 @@ export default function PigmentGame() {
           </p>
         )}
         {screen === "home" && (
-          <section className="welcome">
-            <span className="welcome-kicker">
-              A LITTLE COLOR. A LITTLE MAGIC.
-            </span>
-            <h1 className="wordmark">
-              Pigment<span aria-hidden="true">♡</span>
-            </h1>
-            <p className="welcome-description">
-              A paintbox full of little wonders.
-            </p>
-            <div className="welcome-content">
-              <div className="hero-medallion">
-                <PicturePreview picture={pictures[0]} />
-                <span className="medallion-star" aria-hidden="true">
-                  ✦
-                </span>
-              </div>
-              <nav className="main-menu" aria-label="Game menu">
-                <button
-                  className="game-button start-button"
-                  disabled={!hasLoaded}
-                  onClick={() => setScreen("pictures")}
-                >
-                  <GameIcon icon={Brush} />{" "}
-                  {hasLoaded ? "Start painting" : "Opening paintbox…"}
-                </button>
-                <button
-                  className="game-button"
-                  disabled={!hasLoaded}
-                  onClick={() => setScreen("gallery")}
-                >
-                  <GameIcon icon={Images} /> My gallery
-                </button>
-                <button
-                  className="game-button gold"
-                  disabled={!hasLoaded}
-                  onClick={openImporter}
-                >
-                  <GameIcon icon={Plus} /> Add a picture
-                </button>
-                <button
-                  className="game-button"
-                  disabled={!hasLoaded}
-                  onClick={() => setScreen("workshop")}
-                >
-                  <GameIcon icon={Wrench} /> Puzzle Workshop
-                </button>
-              </nav>
-            </div>
-            <p className="welcome-footer">
-              For small artists with big imaginations{" "}
-              <span aria-hidden="true">✧</span>
-            </p>
-          </section>
+          <WelcomeScreen
+            isReady={hasLoaded}
+            onStart={() => setScreen("pictures")}
+            onGallery={() => setScreen("gallery")}
+            onImport={openImporter}
+            onWorkshop={() => setScreen("workshop")}
+          />
         )}
         {screen === "pictures" && (
           <section className="selection-screen">

@@ -7,13 +7,21 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 2px 2px 18px;
+  padding: 3px 3px 22px;
 }
 .controls output {
-  min-width: 44px;
+  display: grid;
+  place-items: center;
+  min-width: 60px;
+  min-height: 48px;
+  padding: 8px;
+  border-radius: 18px;
   text-align: center;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
+  color: #825b96;
+  background: #f4eafa;
+  box-shadow: inset 0 2px 4px #c49dd11c;
 }
 .viewport {
   width: min(100%, calc(65dvh * var(--ratio)));
@@ -21,9 +29,12 @@
   aspect-ratio: var(--ratio);
   overflow: auto;
   margin: auto;
-  border-radius: 6px;
+  border-radius: 16px;
   overscroll-behavior: contain;
   touch-action: pan-x pan-y;
+  background: white;
+  scrollbar-color: #d6bde5 #fff6fa;
+  scrollbar-width: thin;
 }
 .stage {
   position: relative;
@@ -38,20 +49,25 @@
 }
 .hint {
   text-align: center;
-  font-size: 12px;
-  margin: 12px 0 0;
-  color: #795480;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 15px 0 0;
+  color: #896596;
+}
+.stage[data-allow-pan="false"] canvas {
+  touch-action: none !important;
 }
 @media (max-width: 760px) {
   .controls {
-    gap: 8px;
+    gap: 10px;
+    padding-bottom: 20px;
   }
   .controls button {
-    padding: 8px !important;
-    font-size: 11px !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+    min-height: 48px;
   }
-}
-
-.stage[data-allow-pan="false"] canvas {
-  touch-action: none !important;
+  .controls output {
+    min-width: 54px;
+  }
 }

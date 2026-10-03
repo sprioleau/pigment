@@ -35,9 +35,9 @@ An enchanted color-by-number game for little artists. Pick a picture, choose a p
 
 ## Made for small artists
 
-Storybook frames, plum and gold, cream paper, and colorful paint buckets give Pigment its **Enchanted Paintbox** style. The layout adapts to phones and tablets, with zoom and panning for small areas. Paint bursts respect reduced-motion preferences. Region buttons are available only in the explicit `?debug=1` testing mode.
+Pigment’s **Puffy Paint Club** style brings together a big toy unicorn, pastel paint buckets, soft sculpted controls, and a cream-and-peach backdrop. The welcome screen uses Three.js for floating buttons and a projecting brush, with accessible HTML controls and a fallback when WebGL is unavailable. The layout adapts to phones and tablets, with zoom and panning for small areas. Paint bursts respect reduced-motion preferences. Region buttons are available only in the explicit `?debug=1` testing mode.
 
-Try the [Puffy Paint Club Three.js exploration](https://pigment.sprioleau.dev/explore/puffy): a large toy unicorn, floating clay buttons, and a projecting 3D brush. This is an interactive design preview; the main game retains its current appearance while the new direction is reviewed.
+The [original interactive Three.js exploration](https://pigment.sprioleau.dev/explore/puffy) is also preserved for comparison.
 
 On iPhone or iPad, open the game in Safari and choose **Share → Add to Home Screen**. Pigment includes a web app manifest and Apple home-screen icons for a standalone app experience.
 
