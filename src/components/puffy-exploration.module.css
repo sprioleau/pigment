@@ -1,0 +1,27 @@
+.world { min-height: 100dvh; padding: 22px 40px 35px; color: #80608c; font-family: ui-rounded, "Arial Rounded MT Bold", "Trebuchet MS", Arial, sans-serif; background: radial-gradient(ellipse at 0% 0%, #ffe1d5, transparent 35%), radial-gradient(ellipse at 100% 100%, #f2dde9, transparent 45%), #fff3e5; }
+.explorationHeader { max-width: 1250px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: 12px; color: #a080a1; }
+.explorationHeader a { display: inline-flex; gap: 6px; align-items: center; color: #80608c; text-decoration: none; padding: 12px 16px; border-radius: 20px; background: #fffbf2; box-shadow: 0 3px 0 #efddce; font-weight: 700; }
+.puffy-welcome { min-height: calc(100dvh - 135px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 35px; align-items: center; max-width: 1240px; margin: auto; }
+.puffy-brand { position: relative; text-align: center; }
+.puffy-logo { margin: 0; position: relative; z-index: 1; }
+.puffy-logo img { width: 100%; height: auto; object-fit: contain; max-height: 650px; filter: drop-shadow(0 12px 10px #ab8a7420); }
+.puffy-tagline { margin: -15px auto 0; font-size: clamp(20px, 2.2vw, 29px); font-weight: 700; line-height: 1.3; color: #97729f; transform: rotate(-4deg); }
+.puffy-star { position: absolute; color: #ffdb75; width: 74px; height: 74px; z-index: 0; filter: drop-shadow(0 4px 2px #edbd6966); }
+.puffy-star-one { top: 3%; left: 0; transform: rotate(-15deg); }.puffy-star-two { bottom: 12%; right: -6%; font-size: 48px; transform: rotate(15deg); }
+.puffy-menu-panel { padding: 25px 0; }
+.puffy-invitation { text-align: center; color: #9c7aa7; font-weight: 700; font-size: 18px; margin: 0 0 25px; }
+.puffy-menu { position: relative; display: flex; flex-direction: column; gap: 26px; }
+.scene { position: absolute; inset: -18px; width: calc(100% + 36px); height: calc(100% + 36px); pointer-events: none; }
+.puffy-menu-button { --button-light: #ffaac9; --button-color: #f38cb4; --button-shadow: #d57a9f; z-index: 1; position: relative; width: 100%; display: flex; align-items: center; gap: 19px; text-align: left; height: 106px; flex-shrink: 0; padding: 15px 24px; border: 2px solid var(--button-light); border-radius: 45px; background: linear-gradient(var(--button-light), var(--button-color)); box-shadow: inset 0 5px 8px #ffffff77, inset 0 -5px 8px #764d6525, 0 6px 0 var(--button-shadow), 0 12px 15px #92756133; color: #fffdf5; font-size: clamp(22px, 2.5vw, 33px); font-weight: 700; letter-spacing: -.03em; text-shadow: 0 3px 3px #71545b55; transition: transform .15s, filter .15s; }
+.puffy-menu-button:hover:not(:disabled) { transform: translateY(-3px); filter: brightness(1.04); }.puffy-menu-button:active:not(:disabled) { transform: translateY(4px); }
+.puffy-menu-button:focus-visible { outline: 4px solid #76608f; outline-offset: 6px; }
+.hasThreeScene .puffy-menu-button { background: transparent; border-color: transparent; box-shadow: none; }
+.hasThreeScene .puffy-menu-button:first-of-type .puffy-menu-icon { opacity: 0; }
+.puffy-mint { --button-light: #8de0d6; --button-color: #62c6bc; --button-shadow: #54a79c; }.puffy-lavender { --button-light: #d3b7ed; --button-color: #b796d8; --button-shadow: #9e7cbc; }.puffy-blue { --button-light: #9bdee7; --button-color: #71c7d2; --button-shadow: #5ca9b3; }
+.puffy-menu-icon { flex: 0 0 62px; width: 62px; height: 62px; overflow: visible; filter: drop-shadow(0 4px 2px #79576033); transform: rotate(-8deg); }
+.puffy-chevron { margin-left: auto; width: 44px; height: 44px; flex-shrink: 0; filter: drop-shadow(0 3px 2px #71545b55); }
+.puffy-kindness { text-align: center; margin: 31px 0 0; font-size: 15px; font-weight: 700; color: #9d7ca4; }.puffy-kindness span { display: inline-block; margin-left: 8px; font-size: 23px; vertical-align: middle; }
+.explorationHint { text-align: center; color: #a182a3; font-size: 12px; margin: 10px 0 0; }
+@media (max-width: 1050px) { .puffy-welcome { gap: 25px; }.puffy-menu-button { height: 92px; padding: 13px 20px; gap: 13px; font-size: 25px; }.puffy-menu-icon { width: 52px; height: 52px; flex-basis: 52px; }.puffy-tagline { font-size: 22px; } }
+@media (max-width: 760px) { .world { padding: 16px 25px 35px; }.explorationHeader { font-size: 10px; }.explorationHeader span { text-align: right; max-width: 130px; }.puffy-welcome { grid-template-columns: 1fr; min-height: auto; gap: 5px; }.puffy-brand { max-width: 340px; width: 100%; margin: 12px auto 0; }.puffy-logo img { max-height: 310px; }.puffy-tagline { font-size: 18px; margin-top: -8px; }.puffy-star-one { font-size: 50px; }.puffy-star-two { right: 0; bottom: 18%; font-size: 36px; }.puffy-menu-panel { width: 100%; max-width: 450px; margin: auto; padding: 28px 0 0; }.puffy-invitation { font-size: 14px; margin-bottom: 19px; }.puffy-menu { gap: 19px; }.puffy-menu-button { height: 78px; padding: 10px 18px; border-radius: 32px; font-size: 23px; }.puffy-menu-icon { width: 46px; height: 46px; flex-basis: 46px; }.puffy-chevron { font-size: 43px; }.puffy-kindness { margin-top: 24px; font-size: 13px; } }
+@media (prefers-reduced-motion: reduce) { .puffy-menu-button { transition: none; }.puffy-menu-button:hover, .puffy-menu-button:active { transform: none; } }

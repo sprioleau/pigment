@@ -1,0 +1,57 @@
+.zoom {
+  width: 100%;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 2px 2px 18px;
+}
+.controls output {
+  min-width: 44px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.viewport {
+  width: min(100%, calc(65dvh * var(--ratio)));
+  max-height: 65dvh;
+  aspect-ratio: var(--ratio);
+  overflow: auto;
+  margin: auto;
+  border-radius: 6px;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+.stage {
+  position: relative;
+}
+.stage canvas {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  height: auto !important;
+  touch-action: pan-x pan-y !important;
+}
+.hint {
+  text-align: center;
+  font-size: 12px;
+  margin: 12px 0 0;
+  color: #795480;
+}
+@media (max-width: 760px) {
+  .controls {
+    gap: 8px;
+  }
+  .controls button {
+    padding: 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+.stage[data-allow-pan="false"] canvas {
+  touch-action: none !important;
+}

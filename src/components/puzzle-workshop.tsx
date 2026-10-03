@@ -1,5 +1,8 @@
 "use client";
 
+import { Brush, Eraser, Hand, Home, Move, PaintBucket, Save, Scan, Undo2 } from "lucide-react";
+import GameIcon from "./game-icon";
+import CanvasZoom from "./canvas-zoom";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
   analyzeRegions,
@@ -18,9 +21,9 @@ type Props = {
   onSave: (picture: Picture) => boolean;
   onBack: () => void;
 };
-type Tool = "assign" | "label" | "draw" | "erase";
+type Tool = "assign" | "label" | "draw" | "erase" | "pan";
 type Point = { x: number; y: number };
-type Gesture = { tool: Tool; id: number; point: Point };
+type Gesture = { tool: Exclude<Tool, "pan">; id: number; point: Point };
 
 export default function PuzzleWorkshop({ pictures, onSave, onBack }: Props) {
   const [selectedId, setSelectedId] = useState(pictures[0]?.id ?? "");
@@ -30,7 +33,7 @@ export default function PuzzleWorkshop({ pictures, onSave, onBack }: Props) {
     <section className={styles.workshop}>
       <header className="screen-header">
         <button className="game-button small" onClick={onBack}>
-          ← Home
+          <GameIcon icon={Home} /> Home
         </button>
         <div>
           <span className="eyebrow">A GROWN-UP LITTLE HELPER</span>
@@ -69,7 +72,9 @@ function WorkshopEditor({
   source: Picture;
   onSave: Props["onSave"];
 }) {
+  const [isDebug] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("debug") === "1");
   const [picture, setPicture] = useState(source);
+  const initialSourceRef = useRef(source);
   const [segmentation, setSegmentation] = useState<Segmentation | null>(null);
   const [tool, setTool] = useState<Tool>("assign");
   const [selectedNumber, setSelectedNumber] = useState(1);
@@ -95,7 +100,12 @@ function WorkshopEditor({
   useEffect(() => {
     let isCancelled = false;
     const requestState = loadRequestRef;
-    prepareArtwork(source.image, source.seeds, source.defaultNumber)
+    /*
+      The editor is keyed by picture ID. Saving its current draft updates the
+      parent library without reloading this draft or replacing its saved status.
+    */
+    const initialSource = initialSourceRef.current;
+    prepareArtwork(initialSource.image, initialSource.seeds, initialSource.defaultNumber)
       .then((data) => {
         if (isCancelled) return;
         const canvas = document.createElement("canvas");
@@ -131,7 +141,7 @@ function WorkshopEditor({
       isCancelled = true;
       requestState.current++;
     };
-  }, [source]);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -203,7 +213,7 @@ function WorkshopEditor({
           ? "Tap or drag a number within its own area. Or use the position fields below."
           : next === "draw"
             ? "Draw black boundaries to close gaps or split an area. Release to analyze."
-            : "Erase boundaries with the white brush. Release to analyze.",
+            : next === "erase" ? "Erase boundaries with the white brush. Release to analyze." : "Swipe the enlarged picture to look around. Choose an editing tool when ready.",
     );
   }
 
@@ -283,7 +293,7 @@ function WorkshopEditor({
   }
 
   function pointerDown(event: PointerEvent<HTMLCanvasElement>): void {
-    if (isBusy || !segmentation || event.button !== 0) return;
+    if (isBusy || !segmentation || event.button !== 0 || tool === "pan") return;
     const point = pointerPoint(event);
     const id = regionAt(
       segmentation.ids,
@@ -458,7 +468,7 @@ function WorkshopEditor({
           disabled={isBusy || !segmentation?.regions.length}
           onClick={savePicture}
         >
-          Save puzzle changes
+          <GameIcon icon={Save} /> Save puzzle changes
         </button>
       </div>
       <div className={styles.tools} aria-label="Workshop tools">
@@ -468,6 +478,7 @@ function WorkshopEditor({
             ["label", "Move numbers"],
             ["draw", "Draw boundaries"],
             ["erase", "Erase boundaries"],
+            ["pan", "Pan picture"],
           ] as [Tool, string][]
         ).map(([value, text]) => (
           <button
@@ -477,7 +488,7 @@ function WorkshopEditor({
             disabled={isBusy}
             onClick={() => changeTool(value)}
           >
-            {text}
+            <GameIcon icon={{ assign: PaintBucket, label: Move, draw: Brush, erase: Eraser, pan: Hand }[value]} />{text}
           </button>
         ))}
         <button
@@ -485,14 +496,14 @@ function WorkshopEditor({
           disabled={isBusy || !history.length}
           onClick={undo}
         >
-          Undo workshop change
+          <GameIcon icon={Undo2} /> Undo workshop change
         </button>
         <button
           className="game-button small"
           disabled={isBusy || !segmentation}
           onClick={() => analyzeArtwork(false)}
         >
-          Analyze regions
+          <GameIcon icon={Scan} /> Analyze regions
         </button>
       </div>
       <div className={styles.options}>
@@ -580,15 +591,17 @@ function WorkshopEditor({
         </aside>
         <div>
           <div className={styles.paper}>
+            <CanvasZoom width={segmentation?.width ?? 1} height={segmentation?.height ?? 1} shouldAllowPanning={tool === "pan"}>
             <canvas
               ref={canvasRef}
-              aria-label="Puzzle editing canvas. Use region buttons and position fields below for keyboard editing."
+              aria-label="Puzzle editing canvas. Select a tool, then edit an area or number."
               onPointerDown={pointerDown}
               onPointerMove={pointerMove}
               onPointerUp={pointerUp}
               onPointerCancel={pointerUp}
-              style={{ cursor: tool === "label" ? "move" : "crosshair" }}
+              style={{ cursor: tool === "pan" ? "grab" : tool === "label" ? "move" : "crosshair" }}
             />
+            </CanvasZoom>
           </div>
           <p className={styles.status} role="status">
             {message}
@@ -687,7 +700,7 @@ function WorkshopEditor({
               </label>
             </div>
           )}
-          {segmentation && (
+          {isDebug && segmentation && (
             <details className={styles.regions}>
               <summary>Edit areas with buttons</summary>
               <p>

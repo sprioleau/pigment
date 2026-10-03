@@ -16,6 +16,7 @@ An enchanted color-by-number game for little artists. Pick a picture, choose a p
 
 - **Choose an adventure.** Cloud Unicorn, Flower Kitty, and Clover Cow, with difficulty filters and large picture cards.
 - **Paint with a little magic.** Touch or click the HTML canvas. A brush cursor carries your selected color, and each correct fill sends out a burst of paint.
+- **Get a closer look.** Zoom into small areas and pan around the artwork, then fit the picture back into view.
 - **Take your time.** Gentle wrong-color hints, undo, and a gallery that keeps unfinished pictures ready to resume.
 - **Keep your masterpiece.** Download a PNG whenever you like, with the painted artwork and no printed numbers or game controls.
 - **Make another.** Paint again or choose a different picture after finishing.
@@ -34,7 +35,9 @@ An enchanted color-by-number game for little artists. Pick a picture, choose a p
 
 ## Made for small artists
 
-Storybook frames, plum and gold, cream paper, and colorful paint buckets give Pigment its **Enchanted Paintbox** style. The layout adapts to phones and tablets; numbered buckets and keyboard-accessible area buttons offer another way to paint. Paint bursts respect reduced-motion preferences.
+Storybook frames, plum and gold, cream paper, and colorful paint buckets give Pigment its **Enchanted Paintbox** style. The layout adapts to phones and tablets, with zoom and panning for small areas. Paint bursts respect reduced-motion preferences. Region buttons are available only in the explicit `?debug=1` testing mode.
+
+Try the [Puffy Paint Club Three.js exploration](https://pigment.sprioleau.dev/explore/puffy): a large toy unicorn, floating clay buttons, and a projecting 3D brush. This is an interactive design preview; the main game retains its current appearance while the new direction is reviewed.
 
 On iPhone or iPad, open the game in Safari and choose **Share → Add to Home Screen**. Pigment includes a web app manifest and Apple home-screen icons for a standalone app experience.
 

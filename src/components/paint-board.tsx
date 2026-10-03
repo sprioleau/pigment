@@ -1,5 +1,8 @@
 "use client";
 
+import { ArrowLeft, Check, Download, RotateCcw, Save, Undo2, X } from "lucide-react";
+import GameIcon from "./game-icon";
+import CanvasZoom from "./canvas-zoom";
 import { useEffect, useRef, useState, type PointerEvent, type CSSProperties } from "react";
 import Image from "next/image";
 import styles from "./paint-cursor.module.css";
@@ -18,6 +21,8 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
   const [exportImage, setExportImage] = useState("");
   const [bursts, setBursts] = useState<Burst[]>([]);
   const [history, setHistory] = useState<Record<number, number>[]>([]);
+  const [isDebug] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("debug") === "1");
+  const tapStart = useRef<{ x: number; y: number; id: number } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const brushRef = useRef<HTMLDivElement>(null);
   const [isBrushVisible, setIsBrushVisible] = useState(false);
@@ -127,9 +132,16 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
     brushRef.current.style.transform = `translate3d(${event.clientX - 8}px, ${event.clientY - 73.12}px, 0)`;
   }
 
-  function handlePointer(event: PointerEvent<HTMLCanvasElement>): void {
+  function startPointer(event: PointerEvent<HTMLCanvasElement>): void {
     moveBrush(event);
-    if (!segmentation || event.button !== 0) return;
+    if (event.button !== 0) return;
+    tapStart.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
+  }
+
+  function finishPointer(event: PointerEvent<HTMLCanvasElement>): void {
+    const start = tapStart.current;
+    tapStart.current = null;
+    if (!segmentation || !start || start.id !== event.pointerId || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width;
     const y = (event.clientY - bounds.top) / bounds.height;
@@ -161,27 +173,29 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
         </div>
       </div>
       <header className="screen-header">
-        <button className="game-button small" onClick={leavePainting}>← Pictures</button>
+        <button className="game-button small" onClick={leavePainting}><GameIcon icon={ArrowLeft} /> Pictures</button>
         <div><span className="eyebrow">{isEditing ? "MAKE A NEW ADVENTURE" : "YOUR LITTLE MASTERPIECE"}</span><h1>{picture.title}</h1></div>
-        <div className="toolbar">{!isEditing && <><button className="game-button small" disabled={!segmentation} onClick={saveDrawing}>♡ Save</button><button className="game-button small gold" disabled={!segmentation} onClick={downloadDrawing}>↓ Download</button></>}</div>
+        <div className="toolbar">{!isEditing && <><button className="game-button small" disabled={!segmentation} onClick={saveDrawing}><GameIcon icon={Save} /> Save</button><button className="game-button small gold" disabled={!segmentation} onClick={downloadDrawing}><GameIcon icon={Download} /> Download</button></>}</div>
       </header>
       <div className="paint-layout">
         <aside className="palette" aria-label="Paint buckets">
           <span className="palette-title">Your colors</span>
           {picture.palette.map((color, index) => <button key={index} className={`bucket ${selectedNumber === index + 1 ? "is-selected" : ""}`} style={{ "--paint": color } as CSSProperties} aria-label={`Bucket ${index + 1}: ${picture.names[index]}`} aria-pressed={selectedNumber === index + 1} onClick={() => { setSelectedNumber(index + 1); setMessage(`Bucket ${index + 1} is ready!`); }}><span className="bucket-handle" /><span className="bucket-lip" /><span className="bucket-number">{index + 1}</span><span className="bucket-shine" /></button>)}
-          {!isEditing && <button className="undo-button" disabled={!history.length} onClick={undo}>↶ Undo</button>}
+          {!isEditing && <button className="undo-button" disabled={!history.length} onClick={undo}><GameIcon icon={Undo2} /> Undo</button>}
         </aside>
         <div className="canvas-area">
           <div className="paper-frame">
             {error ? <p role="alert" className="canvas-message">{error}</p> : !segmentation ? <p className="canvas-message" role="status">Preparing a little magic…</p> : null}
-            <canvas ref={canvasRef} aria-label={`${picture.title} coloring canvas. Use the numbered area buttons below for keyboard painting.`} onPointerDown={handlePointer} onPointerEnter={moveBrush} onPointerMove={moveBrush} onPointerLeave={() => setIsBrushVisible(false)} style={{ cursor: isBrushVisible ? "none" : "crosshair", display: segmentation ? "block" : "none" }} />
-            <div className="bursts" aria-hidden="true">{bursts.map((burst) => <div key={burst.id} className="burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }}>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ "--dx": `${Math.cos(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, "--dy": `${Math.sin(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, background: burst.color, opacity: .45 + (i % 3) * .2 } as CSSProperties} />)}</div>)}</div>
+            <CanvasZoom width={segmentation?.width ?? 1} height={segmentation?.height ?? 1}>
+            <canvas ref={canvasRef} aria-label={`${picture.title} coloring canvas. Choose a numbered paint bucket, then tap a matching area.`} onPointerDown={startPointer} onPointerUp={finishPointer} onPointerCancel={() => { tapStart.current = null; }} onPointerEnter={moveBrush} onPointerMove={moveBrush} onPointerLeave={() => setIsBrushVisible(false)} style={{ cursor: isBrushVisible ? "none" : "crosshair", display: segmentation ? "block" : "none" }} />
+            <div className="bursts" style={{ inset: 0 }} aria-hidden="true">{bursts.map((burst) => <div key={burst.id} className="burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }}>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ "--dx": `${Math.cos(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, "--dy": `${Math.sin(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, background: burst.color, opacity: .45 + (i % 3) * .2 } as CSSProperties} />)}</div>)}</div>
+            </CanvasZoom>
           </div>
           {!isEditing && <div className="progress-row"><span>✦ {completed} of {total} little wonders</span><progress value={completed} max={total || 1} aria-label="Painting progress" /></div>}
           <p className="paint-hint" role="status">{message}</p>
-          {exportImage && <section className="export-card" aria-label="Exported picture"><div><h2>A little wonder to keep</h2><p>Your PNG includes your painting, without numbers or game controls.</p><form action="/api/export" method="post"><input type="hidden" name="image" value={exportImage} /><input type="hidden" name="name" value={picture.id} /><button className="game-button small gold" type="submit">Save PNG</button></form><button className="export-close" aria-label="Close export preview" onClick={() => setExportImage("")}>×</button></div><Image src={exportImage} alt={`Export of ${picture.title}`} width={200} height={200} unoptimized /></section>}
-          {isComplete && <section className="completion"><span className="eyebrow">EVERY COLOR FOUND ITS HOME</span><h2>You made something magical! ✨</h2><div className="completion-actions"><button className="game-button small gold" onClick={saveDrawing}>Save my masterpiece</button><button className="game-button small" onClick={() => { if (saveDrawing()) onAgain(); }}>Paint again</button><button className="game-button small" onClick={leavePainting}>Choose another picture</button></div></section>}
-          {segmentation && <details className="accessible-regions"><summary>{isEditing ? "Assign areas with buttons" : "Paint areas with buttons"}</summary><p>Choose a bucket above, then choose an area.</p><div>{segmentation.regions.map((region, index) => <button className="region-button" key={region.id} disabled={!isEditing && Boolean(fills[region.id])} onClick={() => colorRegion(region.id)}>Area {index + 1} · {picture.assignments?.[region.id] ?? region.number}{fills[region.id] ? " ✓" : ""}</button>)}</div></details>}
+          {exportImage && <section className="export-card" aria-label="Exported picture"><div><h2>A little wonder to keep</h2><p>Your PNG includes your painting, without numbers or game controls.</p><form action="/api/export" method="post"><input type="hidden" name="image" value={exportImage} /><input type="hidden" name="name" value={picture.id} /><button className="game-button small gold" type="submit"><GameIcon icon={Download} /> Save PNG</button></form><button className="export-close" aria-label="Close export preview" onClick={() => setExportImage("")}><GameIcon icon={X} /></button></div><Image src={exportImage} alt={`Export of ${picture.title}`} width={200} height={200} unoptimized /></section>}
+          {isComplete && <section className="completion"><span className="eyebrow">EVERY COLOR FOUND ITS HOME</span><h2>You made something magical! ✨</h2><div className="completion-actions"><button className="game-button small gold" onClick={saveDrawing}><GameIcon icon={Save} /> Save my masterpiece</button><button className="game-button small" onClick={() => { if (saveDrawing()) onAgain(); }}><GameIcon icon={RotateCcw} /> Paint again</button><button className="game-button small" onClick={leavePainting}><GameIcon icon={ArrowLeft} /> Choose another picture</button></div></section>}
+          {isDebug && segmentation && <details className="accessible-regions"><summary>{isEditing ? "Assign areas with buttons" : "Paint areas with buttons"}</summary><p>Choose a bucket above, then choose an area.</p><div>{segmentation.regions.map((region, index) => <button className="region-button" key={region.id} disabled={!isEditing && Boolean(fills[region.id])} onClick={() => colorRegion(region.id)}>Area {index + 1} · {picture.assignments?.[region.id] ?? region.number}{fills[region.id] ? <GameIcon icon={Check} /> : null}</button>)}</div></details>}
         </div>
       </div>
     </section>

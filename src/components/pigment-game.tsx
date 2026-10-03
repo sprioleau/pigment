@@ -1,5 +1,7 @@
 "use client";
 
+import { Brush, Check, Home, Images, Plus, Wrench, X } from "lucide-react";
+import GameIcon from "./game-icon";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import PaintBoard from "./paint-board";
@@ -297,7 +299,7 @@ export default function PigmentGame() {
           <p className="notice" role="alert">
             {notice}
             <button onClick={() => setNotice("")} aria-label="Dismiss message">
-              ×
+              <GameIcon icon={X} />
             </button>
           </p>
         )}
@@ -325,7 +327,7 @@ export default function PigmentGame() {
                   disabled={!hasLoaded}
                   onClick={() => setScreen("pictures")}
                 >
-                  <span aria-hidden="true">▶</span>{" "}
+                  <GameIcon icon={Brush} />{" "}
                   {hasLoaded ? "Start painting" : "Opening paintbox…"}
                 </button>
                 <button
@@ -333,21 +335,21 @@ export default function PigmentGame() {
                   disabled={!hasLoaded}
                   onClick={() => setScreen("gallery")}
                 >
-                  <span aria-hidden="true">▧</span> My gallery
+                  <GameIcon icon={Images} /> My gallery
                 </button>
                 <button
                   className="game-button gold"
                   disabled={!hasLoaded}
                   onClick={openImporter}
                 >
-                  <span aria-hidden="true">＋</span> Add a picture
+                  <GameIcon icon={Plus} /> Add a picture
                 </button>
                 <button
                   className="game-button"
                   disabled={!hasLoaded}
                   onClick={() => setScreen("workshop")}
                 >
-                  <span aria-hidden="true">✎</span> Puzzle Workshop
+                  <GameIcon icon={Wrench} /> Puzzle Workshop
                 </button>
               </nav>
             </div>
@@ -364,7 +366,7 @@ export default function PigmentGame() {
                 className="game-button small"
                 onClick={() => setScreen("home")}
               >
-                ← Home
+                <GameIcon icon={Home} /> Home
               </button>
               <div>
                 <span className="eyebrow">OPEN YOUR PAINTBOX</span>
@@ -374,7 +376,7 @@ export default function PigmentGame() {
                 className="game-button small gold"
                 onClick={() => setScreen("gallery")}
               >
-                My gallery
+                <GameIcon icon={Images} /> My gallery
               </button>
             </header>
             <div className="difficulty-tabs" aria-label="Picture difficulty">
@@ -418,7 +420,7 @@ export default function PigmentGame() {
                   </button>
                 ))}
               <button className="picture-card add-card" onClick={openImporter}>
-                <span aria-hidden="true">＋</span>
+                <GameIcon icon={Plus} />
                 <span className="picture-title">Bring your own magic</span>
                 <span className="picture-level">Add a new picture</span>
               </button>
@@ -452,7 +454,7 @@ export default function PigmentGame() {
                 className="game-button small"
                 onClick={() => setScreen("home")}
               >
-                ← Home
+                <GameIcon icon={Home} /> Home
               </button>
               <div>
                 <span className="eyebrow">MADE BY YOU, WITH MAGIC</span>
@@ -462,7 +464,7 @@ export default function PigmentGame() {
                 className="game-button small gold"
                 onClick={() => setScreen("pictures")}
               >
-                Paint something new
+                <GameIcon icon={Brush} /> Paint something new
               </button>
             </header>
             <p className="gallery-description">
@@ -507,7 +509,7 @@ export default function PigmentGame() {
                   className="game-button gold"
                   onClick={() => setScreen("pictures")}
                 >
-                  Let&apos;s make something
+                  <GameIcon icon={Brush} /> Let&apos;s make something
                 </button>
               </div>
             )}
@@ -523,7 +525,7 @@ export default function PigmentGame() {
               <>
                 <header className="screen-header">
                   <button className="game-button small" onClick={leaveImporter}>
-                    ← Home
+                    <GameIcon icon={Home} /> Home
                   </button>
                   <div>
                     <span className="eyebrow">A GROWN-UP LITTLE HELPER</span>
@@ -551,9 +553,7 @@ export default function PigmentGame() {
                     placeholder="My magical picture"
                   />
                   <label className="upload-label" htmlFor="picture-file">
-                    {isImporting
-                      ? "Preparing your picture…"
-                      : "＋ Choose a picture file"}
+                    <GameIcon icon={Plus} />{isImporting ? "Preparing your picture…" : "Choose a picture file"}
                   </label>
                   <input
                     className="file-input"
@@ -589,7 +589,7 @@ export default function PigmentGame() {
                     className="game-button small gold"
                     onClick={finishImport}
                   >
-                    Add to paintbox & play
+                    <GameIcon icon={Check} /> Add to paintbox & play
                   </button>
                 </div>
                 <p className="setup-note">
