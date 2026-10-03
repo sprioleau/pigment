@@ -2,16 +2,12 @@
 
 import { useEffect, useRef, useState, type PointerEvent, type CSSProperties } from "react";
 import Image from "next/image";
+import styles from "./paint-cursor.module.css";
 import type { Picture } from "@/lib/pictures";
-import { paintPixels, prepareArtwork, regionAt, type Segmentation } from "@/lib/paint-engine";
+import { getRegionLabelPosition, paintPixels, prepareArtwork, regionAt, type Segmentation } from "@/lib/paint-engine";
 
 type Props = { picture: Picture; initialFills: Record<number, number>; isEditing?: boolean; onAssign?: (id: number, number: number) => void; onSave: (fills: Record<number, number>, thumbnail: string, total: number) => boolean; onBack: () => void; onAgain: () => void };
 type Burst = { id: number; x: number; y: number; color: string };
-
-function brushCursor(color: string): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><path d="M15 28L34 6q5-4 6 2L22 32z" fill="#76519f" stroke="#392449" stroke-width="2"/><path d="M14 27l8 5-5 7-9-4z" fill="#e4bf6d" stroke="#392449" stroke-width="2"/><path d="M8 34q-6 3-5 8 9 0 14-4z" fill="${color}" stroke="#392449" stroke-width="2"/></svg>`;
-  return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 4 40, crosshair`;
-}
 
 export default function PaintBoard({ picture, initialFills, isEditing = false, onAssign, onSave, onBack, onAgain }: Props) {
   const [segmentation, setSegmentation] = useState<Segmentation | null>(null);
@@ -23,6 +19,9 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
   const [bursts, setBursts] = useState<Burst[]>([]);
   const [history, setHistory] = useState<Record<number, number>[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const brushRef = useRef<HTMLDivElement>(null);
+  const [isBrushVisible, setIsBrushVisible] = useState(false);
+  const [isBrushLoaded, setIsBrushLoaded] = useState(false);
   const timeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hasChanged = useRef(false);
   const selectedColor = picture.palette[selectedNumber - 1];
@@ -56,11 +55,12 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
     for (const region of segmentation.regions) {
       if (fills[region.id] && !isEditing) continue;
       const number = picture.assignments?.[region.id] ?? region.number;
+      const position = getRegionLabelPosition(segmentation, region, picture.labelPositions);
       context.strokeStyle = "white"; context.lineWidth = 3;
-      context.strokeText(String(number), region.x, region.y + 1);
-      context.fillStyle = "#584964"; context.fillText(String(number), region.x, region.y + 1);
+      context.strokeText(String(number), position.x, position.y + 1);
+      context.fillStyle = "#584964"; context.fillText(String(number), position.x, position.y + 1);
     }
-  }, [segmentation, fills, picture.palette, picture.assignments, isEditing]);
+  }, [segmentation, fills, picture.palette, picture.assignments, picture.labelPositions, isEditing]);
 
   useEffect(() => {
     const pendingTimeouts = timeouts.current;
@@ -116,7 +116,19 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
     }
   }
 
+  function moveBrush(event: PointerEvent<HTMLCanvasElement>): void {
+    const shouldShowBrush = event.pointerType === "mouse" && isBrushLoaded && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    setIsBrushVisible(shouldShowBrush);
+    if (!shouldShowBrush || !brushRef.current) return;
+    /*
+      The illustrated bristle tip is at 10%, 91.4% of the 80px sprite.
+      Keep that exact tip under the pointer so paint lands where it points.
+    */
+    brushRef.current.style.transform = `translate3d(${event.clientX - 8}px, ${event.clientY - 73.12}px, 0)`;
+  }
+
   function handlePointer(event: PointerEvent<HTMLCanvasElement>): void {
+    moveBrush(event);
     if (!segmentation || event.button !== 0) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width;
@@ -139,6 +151,15 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
 
   return (
     <section className="painting-screen">
+      <div ref={brushRef} className={styles.brush} data-visible={isBrushVisible} aria-hidden="true">
+        <div className={styles.sprite}>
+          <Image src="/paintbrush.png" width={80} height={80} alt="" unoptimized onLoad={() => setIsBrushLoaded(true)} />
+          <svg className={styles.paint} viewBox="0 0 1000 1000" aria-hidden="true">
+            <path d="M101 914C126 898 131 868 140 841C155 847 184 861 223 864C251 864 273 856 290 846C250 901 184 932 101 914Z" fill={selectedColor} />
+            <path d="M127 909Q175 910 229 881" fill="none" stroke="white" strokeWidth="8" opacity=".5" strokeLinecap="round" />
+          </svg>
+        </div>
+      </div>
       <header className="screen-header">
         <button className="game-button small" onClick={leavePainting}>← Pictures</button>
         <div><span className="eyebrow">{isEditing ? "MAKE A NEW ADVENTURE" : "YOUR LITTLE MASTERPIECE"}</span><h1>{picture.title}</h1></div>
@@ -153,7 +174,7 @@ export default function PaintBoard({ picture, initialFills, isEditing = false, o
         <div className="canvas-area">
           <div className="paper-frame">
             {error ? <p role="alert" className="canvas-message">{error}</p> : !segmentation ? <p className="canvas-message" role="status">Preparing a little magic…</p> : null}
-            <canvas ref={canvasRef} aria-label={`${picture.title} coloring canvas. Use the numbered area buttons below for keyboard painting.`} onPointerDown={handlePointer} style={{ cursor: brushCursor(selectedColor), display: segmentation ? "block" : "none" }} />
+            <canvas ref={canvasRef} aria-label={`${picture.title} coloring canvas. Use the numbered area buttons below for keyboard painting.`} onPointerDown={handlePointer} onPointerEnter={moveBrush} onPointerMove={moveBrush} onPointerLeave={() => setIsBrushVisible(false)} style={{ cursor: isBrushVisible ? "none" : "crosshair", display: segmentation ? "block" : "none" }} />
             <div className="bursts" aria-hidden="true">{bursts.map((burst) => <div key={burst.id} className="burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }}>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ "--dx": `${Math.cos(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, "--dy": `${Math.sin(i * Math.PI / 6) * (30 + i % 3 * 14)}px`, background: burst.color, opacity: .45 + (i % 3) * .2 } as CSSProperties} />)}</div>)}</div>
           </div>
           {!isEditing && <div className="progress-row"><span>✦ {completed} of {total} little wonders</span><progress value={completed} max={total || 1} aria-label="Painting progress" /></div>}

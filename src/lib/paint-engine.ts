@@ -1,6 +1,8 @@
 export type Seed = [number, number, number];
 export type Region = { id: number; area: number; x: number; y: number; number: number };
-export type Segmentation = { width: number; height: number; ids: Int32Array; pixels: Uint8ClampedArray; regions: Region[] };
+export type LabelPosition = { x: number; y: number };
+export type RegionDiagnostics = { regionCount: number; paintablePixelCount: number; smallestRegionArea: number; largestRegionArea: number; tinyRegionCount: number; edgeConnectedRegionCount: number };
+export type Segmentation = { width: number; height: number; ids: Int32Array; pixels: Uint8ClampedArray; regions: Region[]; diagnostics?: { tinyRegionCount: number; edgeConnectedRegionCount: number } };
 
 /*
   Standard four-neighbor flood fill labels connected white pixels once.
@@ -13,6 +15,8 @@ export function segmentPixels(pixels: Uint8ClampedArray, width: number, height: 
   const regions: Region[] = [];
   const centers: [number, number][] = [];
   const minRegionArea = Math.max(65, Math.round(count * 0.0006));
+  let tinyRegionCount = 0;
+  let edgeConnectedRegionCount = 0;
   for (let p = 0; p < count; p++) {
     if (Math.min(pixels[p * 4], pixels[p * 4 + 1], pixels[p * 4 + 2]) < 170) ids[p] = -2;
   }
@@ -42,6 +46,8 @@ export function segmentPixels(pixels: Uint8ClampedArray, width: number, height: 
       }
     }
     if (hasEdge || tail < minRegionArea) {
+      if (hasEdge) edgeConnectedRegionCount++;
+      else tinyRegionCount++;
       for (let i = 0; i < tail; i++) ids[queue[i]] = -2;
       continue;
     }
@@ -95,7 +101,29 @@ export function segmentPixels(pixels: Uint8ClampedArray, width: number, height: 
     const region = regions.find((item) => item.id === id);
     if (region) region.number = number;
   }
-  return { width, height, ids, pixels, regions };
+  return { width, height, ids, pixels, regions, diagnostics: { tinyRegionCount, edgeConnectedRegionCount } };
+}
+
+export function analyzeRegions(segmentation: Segmentation): RegionDiagnostics {
+  const areas = segmentation.regions.map((region) => region.area);
+  return {
+    regionCount: areas.length,
+    paintablePixelCount: areas.reduce((sum, area) => sum + area, 0),
+    smallestRegionArea: areas.length ? Math.min(...areas) : 0,
+    largestRegionArea: areas.length ? Math.max(...areas) : 0,
+    tinyRegionCount: segmentation.diagnostics?.tinyRegionCount ?? 0,
+    edgeConnectedRegionCount: segmentation.diagnostics?.edgeConnectedRegionCount ?? 0,
+  };
+}
+
+export function getRegionLabelPosition(segmentation: Segmentation, region: Region, labelPositions?: Record<number, LabelPosition>): LabelPosition {
+  const position = labelPositions?.[region.id];
+  if (position && Number.isFinite(position.x) && Number.isFinite(position.y)) {
+    const x = Math.round(position.x * segmentation.width);
+    const y = Math.round(position.y * segmentation.height);
+    if (x >= 0 && y >= 0 && x < segmentation.width && y < segmentation.height && segmentation.ids[y * segmentation.width + x] === region.id) return { x, y };
+  }
+  return { x: region.x, y: region.y };
 }
 
 export function regionAt(ids: Int32Array, width: number, height: number, x: number, y: number): number {

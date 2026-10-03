@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import sharp from "sharp";
-import { segmentPixels, paintPixels, regionAt } from "./paint-engine";
+import { analyzeRegions, getRegionLabelPosition, segmentPixels, paintPixels, regionAt } from "./paint-engine";
 import { PICTURES } from "./pictures";
 
 function makeDividedPage(): Uint8ClampedArray {
@@ -76,6 +76,33 @@ describe("region painting", () => {
     expect(radius).toBeGreaterThan(15);
     expect(radius).toBeLessThan(24);
   });
+
+  it("uses a custom number position only when it stays inside the correct area", () => {
+    const page = segmentPixels(makeDividedPage(), 60, 40);
+    const region = page.regions.find((item) => item.id === regionAt(page.ids, 60, 40, 15, 20))!;
+    expect(getRegionLabelPosition(page, region, { [region.id]: { x: .2, y: .4 } })).toEqual({ x: 12, y: 16 });
+    for (const position of [{ x: .8, y: .4 }, { x: -1, y: .5 }, { x: NaN, y: .5 }]) {
+      expect(getRegionLabelPosition(page, region, { [region.id]: position })).toEqual({ x: region.x, y: region.y });
+    }
+  });
+
+  it("reports paintable areas separately from discarded tiny and edge-connected white areas", () => {
+    const pixels = makeDividedPage();
+    for (let y = 8; y <= 12; y++) {
+      for (let x = 8; x <= 12; x++) {
+        if (y === 8 || y === 12 || x === 8 || x === 12) {
+          const p = (y * 60 + x) * 4;
+          pixels[p] = 0; pixels[p + 1] = 0; pixels[p + 2] = 0;
+        }
+      }
+    }
+    const diagnostics = analyzeRegions(segmentPixels(pixels, 60, 40));
+    expect(diagnostics.regionCount).toBe(2);
+    expect(diagnostics.tinyRegionCount).toBe(1);
+    expect(diagnostics.edgeConnectedRegionCount).toBe(1);
+    expect(diagnostics.paintablePixelCount).toBeGreaterThan(1000);
+    expect(diagnostics.smallestRegionArea).toBeGreaterThan(65);
+  });
 });
 
 for (const picture of PICTURES) {
@@ -96,3 +123,13 @@ for (const picture of PICTURES) {
     }
   });
 }
+
+it("colors Clover Cow's sky blue and surrounding ground green without changing its cream body", async () => {
+  const picture = PICTURES.find((item) => item.id === "cow")!;
+  const { data, info } = await sharp(`public${picture.image}`).resize({ width: 720, height: 720, fit: "inside" }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const page = segmentPixels(new Uint8ClampedArray(data), info.width, info.height, picture.seeds, picture.defaultNumber);
+  for (const [x, y, expected] of [[.476,.075,3],[.843,.263,3],[.760,.253,3],[.663,.268,3],[.935,.546,3],[.822,.769,2],[.368,.94,2],[.60,.58,4]]) {
+    const id = regionAt(page.ids, info.width, info.height, Math.round(x * info.width), Math.round(y * info.height));
+    expect(page.regions.find((region) => region.id === id)?.number).toBe(expected);
+  }
+});
