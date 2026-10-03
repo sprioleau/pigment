@@ -1,0 +1,48 @@
+[
+  {
+    "id": "hello-kitty",
+    "title": "Hello Kitty",
+    "sourceUrl": "https://www.creativekidscolor.com/wp-content/uploads/Hello-Kitty-Color-by-Number.png",
+    "originalFile": "hello-kitty-original.avif",
+    "referenceFile": "hello-kitty-reference.png",
+    "sourceAttribution": "Creative Kids Color; Hello Kitty character by Sanrio",
+    "hasVerifiedRedistributionLicense": false,
+    "palette": [
+      { "number": 1, "name": "Grey", "hex": "#B8BBC5" },
+      { "number": 2, "name": "Red", "hex": "#EE526D" },
+      { "number": 3, "name": "Green", "hex": "#77BF79" },
+      { "number": 4, "name": "Pink", "hex": "#F8AED2" },
+      { "number": 5, "name": "Black", "hex": "#242134" },
+      { "number": 6, "name": "Yellow", "hex": "#F7D564" }
+    ]
+  },
+  {
+    "id": "cow",
+    "title": "Cute Cow",
+    "sourceUrl": "https://www.myteachingstation.com/vault/2599/web/worksheets/preschool/color-by-number/Color-by-Number-Printable-Worksheet-Cute-Cow.jpg",
+    "originalFile": "cow-original.jpg",
+    "sourceAttribution": "© 2021 My Teaching Station",
+    "hasVerifiedRedistributionLicense": false,
+    "palette": [
+      { "number": 1, "name": "Pink", "hex": "#F8AED2" },
+      { "number": 2, "name": "Green", "hex": "#77BF79" },
+      { "number": 3, "name": "Blue", "hex": "#8DCDF1" },
+      { "number": 4, "name": "Beige", "hex": "#F2DDAD" },
+      { "number": 5, "name": "Dark brown", "hex": "#795643" },
+      { "number": 6, "name": "Light brown", "hex": "#BC9572" }
+    ]
+  },
+  {
+    "id": "unicorn-cloud",
+    "title": "Cloud Unicorn",
+    "sourceAttribution": "Original Pigment artwork, generated with the built-in image generation tool",
+    "palette": [
+      { "number": 1, "name": "Mint cream", "hex": "#E6F6E8" },
+      { "number": 2, "name": "Pink", "hex": "#F8AED2" },
+      { "number": 3, "name": "Lavender", "hex": "#B6A0E9" },
+      { "number": 4, "name": "Gold", "hex": "#F7D564" },
+      { "number": 5, "name": "Mint", "hex": "#89DCC0" },
+      { "number": 6, "name": "Light blue", "hex": "#8DCDF1" }
+    ]
+  }
+]
