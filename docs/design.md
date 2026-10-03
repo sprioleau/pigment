@@ -8,12 +8,13 @@ The bottom row of [the concept board](concepts/pigment-directions.png) records t
 
 ## Implemented screens
 
-1. **Welcome:** Pigment wordmark and unicorn medallion, with Start painting, My gallery, and Add a picture controls.
+1. **Welcome:** Pigment wordmark and unicorn medallion, with Start painting, My gallery, Add a picture, and Puzzle Workshop controls.
 2. **Choose a picture:** large illustration cards, difficulty filters, and responsive columns. The starter paintbox contains Cloud Unicorn, Flower Kitty, and Clover Cow.
 3. **Paint:** numbered paint buckets, HTML canvas, selected-color brush cursor, progress, undo, save, and download. Touch and mouse both use Pointer Events. Smaller screens rearrange the layout while keeping controls usable.
 4. **My gallery:** saved finished and unfinished drawings. Opening a drawing resumes its per-region paint state. Storage is local to the current browser.
 5. **Add a picture:** import clean line art, name the picture, then choose buckets and assign numbers to enclosed areas. The setup canvas previews those colors with number labels retained.
 6. **Completion:** save a masterpiece, paint again, or choose another picture.
+7. **Puzzle Workshop:** a grown-up editor for starter and imported puzzles. Edit palette swatches and names, assign area numbers, move labels within their regions, draw or erase outlines, inspect analysis, and save playable changes.
 
 ## Canvas behavior
 
@@ -36,6 +37,16 @@ Repository artwork lives in `public/pictures/`; originals and attribution record
 Cloud Unicorn is original generated artwork with an easier set of regions. Flower Kitty and Clover Cow derive from the user-supplied worksheets. Their redistribution licenses have not been verified. See [source records](../source-art/sources.json) for Creative Kids Color, Sanrio, and My Teaching Station credits.
 
 Imported pictures accept PNG, JPEG, or WebP files up to 12 MB and are resized to at most 720 pixels along the longest edge. Imports require thick, closed outlines without printed numbers; photographs and open outlines are unsuitable. The importer rejects pictures with no enclosed regions or more than 200 regions. All areas begin at number 1, and a grown-up can assign other colors before adding the picture.
+
+## Puzzle Workshop
+
+The workshop offers color assignment, number placement, black boundary drawing, and white boundary erasing. A colored preview helps check the intended result. Number labels can be moved by click or drag; region buttons and percentage position fields provide keyboard editing. Positions stay within the associated region, and invalid stored positions fall back to the automatic label location.
+
+Boundary strokes use an adjustable brush size and re-run segmentation when released. Colors transfer from the old area underneath each new region’s automatic number position; custom number positions reset after boundary changes. Split or merged regions should be checked in the preview before saving. Undo restores up to 30 workshop changes.
+
+Region analysis reports paintable area count, smallest and largest areas, tiny excluded regions, and edge-connected regions. Edge-connected counts include the normal surrounding background; they are a diagnostic clue, not a definitive count of broken outlines. Draw boundaries across gaps to enclose regions, or erase boundaries to join them.
+
+Saving creates or updates a browser-local override with the same picture ID. The picker uses that version without duplicating the original card. Existing gallery drawings retain their earlier picture snapshot. Unsaved drafts are discarded when leaving the workshop or selecting another picture. No shared administration account or cloud publishing is implemented.
 
 ## Persistence and platform
 

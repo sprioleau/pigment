@@ -1,0 +1,6 @@
+Generated with the built-in image_gen tool, transparent_background=true.
+Saved project asset: public/paintbrush.png
+
+Use case: illustration-story. Asset type: game paintbrush cursor sprite for Pigment, a magical enchanted storybook color-by-number game for children age five to six. Create ONE beautifully illustrated paintbrush on a genuinely transparent background. Square canvas. Brush lies diagonally from lower left bristle tip to upper right handle end. Rounded pointed bristle tip at x=22%, y=78%; narrow handle ends at x=78%, y=22%. Soft pale cream bristles with gold ferrule, lavender and plum wooden handle with delicate golden magical ornamentation, tiny pearl sparkle accents engraved on handle. Animated Disney storybook prop feel, soft dimensional shading and warm highlights, clean clear silhouette readable at 80 pixels. NO floating sparkles outside the brush, no paint splatters, no shadow on a ground plane, no background, no text, no other objects. Keep neutral bristles so code can overlay the selected paint hue at the lower-left tip. Entire brush occupies about 80% of canvas diagonally.
+
+Implementation measured the actual generated bristle tip at 10%, 91.4% of the square sprite and uses this exact point as its pointer hotspot.

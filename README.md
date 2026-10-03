@@ -20,13 +20,14 @@ An enchanted color-by-number game for little artists. Pick a picture, choose a p
 - **Keep your masterpiece.** Download a PNG whenever you like, with the painted artwork and no printed numbers or game controls.
 - **Make another.** Paint again or choose a different picture after finishing.
 - **Bring your own art.** Import line art, name it, and assign colors to its enclosed areas while previewing the result.
+- **Fine-tune the puzzle.** A grown-up Puzzle Workshop edits palette colors, area assignments, number positions, and outline boundaries, with colored previews, region analysis, and undo.
 
-| Pick a picture | Make a little magic |
-| --- | --- |
+| Pick a picture                                           | Make a little magic                                             |
+| -------------------------------------------------------- | --------------------------------------------------------------- |
 | ![Picture picker](public/screenshots/picture-picker.jpg) | ![A painting in progress](public/screenshots/painting-half.jpg) |
 
-| A finished little wonder | Your own gallery |
-| --- | --- |
+| A finished little wonder                                        | Your own gallery                                                 |
+| --------------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![Completed painting](public/screenshots/painting-finished.jpg) | ![Saved drawings in the gallery](public/screenshots/gallery.jpg) |
 
 ![Add a picture and assign its colors](public/screenshots/add-picture.jpg)
@@ -64,6 +65,8 @@ Built with **Next.js 16.3.8**, React, TypeScript, and Tailwind CSS 4. Artwork is
 The gallery and imported pictures are stored **in this browser**. They do not sync between devices or browsers, and clearing browser storage removes them. Download favorite paintings to keep a separate copy. A cloud gallery, including Neon storage, has not been provisioned.
 
 Imports accept PNG, JPEG, or WebP files up to 12 MB. Use clean black-and-white line art with thick, closed outlines and **no printed numbers**. Pigment discovers enclosed regions; a grown-up assigns their palette numbers before adding the picture to the paintbox. Photographs and drawings with open outlines are not suitable.
+
+Open **Puzzle Workshop** from the main menu to edit any starter or imported picture. Save its changes to create a playable override in this browser. Existing gallery drawings keep the version they started with. Workshop edits do not publish to other devices or change the repository’s original artwork.
 
 ## Artwork credits
 
